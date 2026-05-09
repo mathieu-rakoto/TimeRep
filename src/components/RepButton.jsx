@@ -7,21 +7,21 @@
  */
 export default function RepButton({repCount, handlePlus, handleLess}) {
 
-    return (<div className="container text-center mb-3">
+    return (<div className="reps-section">
         <h3>{repCount}</h3>
-        <p id="repCount"> {repCount > 1 ? 'reps' : 'rep'} to do</p>
-        <div>
+        <p id="repCount">{repCount > 1 ? 'reps' : 'rep'} to do</p>
+        <div className="button-group">
             <button
-                className="btn btn-success mx-3 my-3"
+                className="btn btn-success"
                 type="button"
                 onClick={handleLess}>
-                rep -
+                − rep
             </button>
             <button
-                className="btn btn-success mx-3 my-3"
+                className="btn btn-success"
                 type="button"
                 onClick={handlePlus}>
-                rep +
+                + rep
             </button>
         </div>
     </div>);

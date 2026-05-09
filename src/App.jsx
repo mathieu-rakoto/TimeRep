@@ -62,13 +62,18 @@ function App() {
     }, [countDown, audio]);
 
     return (<div className="container-fluid">
-        <h1 id="title" className="container text-center mt-5 mb-4">Time' Rep</h1>
-        <CountDown minutes={minutes} seconds={seconds}/>
-        <RepButton repCount={rep} handlePlus={handleClickUp} handleLess={handleClickDown}/>
-        <TimeButtons handleTimeValue={handleTimeValue}/>
-        <PauseButtons handlePauseTime={handlePauseTime}/>
-        <div id="copyright" className="container text-center mt-5">
-            Copyright © TimeRep' v0.2 propriété de Mathieu RAKOTOARITSIMA 08 dec 2023
+        <div id="header">
+            <h1 id="title">Time' Rep</h1>
+            <p id="version">v1.0</p>
+        </div>
+        <div id="main-content">
+            <CountDown minutes={minutes} seconds={seconds}/>
+            <RepButton repCount={rep} handlePlus={handleClickUp} handleLess={handleClickDown}/>
+            <TimeButtons handleTimeValue={handleTimeValue}/>
+            <PauseButtons handlePauseTime={handlePauseTime}/>
+        </div>
+        <div id="copyright" className="text-center">
+            Copyright © TimeRep' v1.0 propriété de Mathieu RAKOTOARITSIMA 09 mai 2026
         </div>
     </div>);
 }
