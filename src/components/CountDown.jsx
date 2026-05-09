@@ -6,9 +6,9 @@
  */
 export default function CountDown({minutes, seconds}) {
 
-    return (<div className="container text-center mb-4">
-        <h2 id="countDown">
+    return (<div className="countdown-section">
+        <div id="countDown">
             {minutes > 10 ? minutes : '0' + minutes} : {seconds > 9 ? seconds : '0' + seconds}
-        </h2>
+        </div>
     </div>);
 }
