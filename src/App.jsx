@@ -64,6 +64,7 @@ function App() {
     return (<div className="container-fluid">
         <div id="header">
             <h1 id="title">Time' Rep</h1>
+            <div id="header-rule"></div>
             <p id="version">v1.0</p>
         </div>
         <div id="main-content">
