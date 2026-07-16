@@ -24,11 +24,18 @@ function App() {
         setRep(rep + 1);
     };
 
+    const startCountDown = (newCountDown) => {
+        setCountDown(Number(newCountDown));
+        setRep(rep === 0 ? 0 : rep - 1);
+    };
+
     const handleTimeValue = (event) => {
-        let newCountDown = event.target.value;
-        setCountDown(newCountDown);
-        let repCopy = rep;
-        setRep(rep === 0 ? 0 : repCopy - 1);
+        startCountDown(event.target.value);
+    };
+
+    // Fonction pour gérer un temps de compte à rebours personnalisé
+    const handleCustomTime = (totalSeconds) => {
+        startCountDown(totalSeconds);
     };
 
     // Fonction pour gérer le temps de pause choisi
@@ -70,7 +77,7 @@ function App() {
         <div id="main-content">
             <CountDown minutes={minutes} seconds={seconds}/>
             <RepButton repCount={rep} handlePlus={handleClickUp} handleLess={handleClickDown}/>
-            <TimeButtons handleTimeValue={handleTimeValue}/>
+            <TimeButtons handleTimeValue={handleTimeValue} handleCustomTime={handleCustomTime}/>
             <PauseButtons handlePauseTime={handlePauseTime}/>
         </div>
         <div id="copyright" className="text-center">
