@@ -154,7 +154,7 @@ h3 {
 .countdown-section,
 .reps-section,
 .time-buttons-section,
-.pause-buttons-section {
+.exercise-timer-section {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -272,7 +272,7 @@ h3 {
     .countdown-section,
     .reps-section,
     .time-buttons-section,
-    .pause-buttons-section {
+    .exercise-timer-section {
         padding: 10px;
     }
 
