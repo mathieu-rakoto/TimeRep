@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import RepButton from "./components/RepButton.jsx";
 import CountDown from "./components/CountDown.jsx";
 import TimeButtons from "./components/TimeButtons.jsx";
-import PauseButtons from "./components/PauseButtons.jsx";
+import ExerciseTimer from "./components/ExerciseTimer.jsx";
 
 function App() {
     const [countDown, setCountDown] = useState(0);
@@ -38,9 +38,9 @@ function App() {
         startCountDown(totalSeconds);
     };
 
-    // Fonction pour gérer le temps de pause choisi
-    const handlePauseTime = (pauseTime) => {
-        setCountDown(pauseTime);  // Met à jour le temps de pause
+    // Fonction pour gérer le temps de l'exercice choisi
+    const handleExcerciceTime = (exerciseTime) => {
+        setCountDown(exerciseTime);  // Met à jour le temps de l'exercice
     };
 
     useEffect(() => {
@@ -72,16 +72,16 @@ function App() {
         <div id="header">
             <h1 id="title">Time' Rep</h1>
             <div id="header-rule"></div>
-            <p id="version">v1.0</p>
+            <p id="version">v2.0</p>
         </div>
         <div id="main-content">
             <CountDown minutes={minutes} seconds={seconds}/>
             <RepButton repCount={rep} handlePlus={handleClickUp} handleLess={handleClickDown}/>
             <TimeButtons handleTimeValue={handleTimeValue} handleCustomTime={handleCustomTime}/>
-            <PauseButtons handlePauseTime={handlePauseTime}/>
+            <ExerciseTimer handleExcerciceTime={handleExcerciceTime}/>
         </div>
         <div id="copyright" className="text-center">
-            Copyright © TimeRep' v1.0 propriété de Mathieu RAKOTOARITSIMA 09 mai 2026
+            Copyright © TimeRep' v2.0 propriété de Mathieu RAKOTOARITSIMA 09 mai 2026
         </div>
     </div>);
 }
