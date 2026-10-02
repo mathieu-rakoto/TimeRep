@@ -232,12 +232,40 @@ h3 {
     transform: scaleX(0.72);
 }
 
+/* Effort libre : la barre pulse tant que la série n'est pas déclarée terminée */
+.sets-timeline-work--waiting {
+    animation: timeline-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes timeline-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sets-timeline-work--waiting {
+        animation: none;
+    }
+}
+
 /* Fin de série */
 .sets-timeline-node {
     width: 10px;
     height: 10px;
     margin: -5px 0 0 -5px;
     border-radius: 50%;
+}
+
+/* Aide sous le champ de durée d'effort */
+.setup-hint {
+    font-size: 11px;
+    color: var(--dim);
+    text-align: center;
+    margin: -6px 0 0;
 }
 
 /* Nombre de séries choisi dans l'écran de réglage */

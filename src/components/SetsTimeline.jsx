@@ -9,9 +9,10 @@
  * @param workTime props de la durée d'un effort, en secondes.
  * @param restTime props de la durée d'un repos, en secondes.
  * @param progress props de la part du programme déjà écoulée (0 à 1).
+ * @param pulsingSet props de l'index de la série dont l'effort attend le clic, -1 sinon.
  * @returns {JSX.Element|null}
  */
-export default function SetsTimeline({totalSets, workTime, restTime, progress}) {
+export default function SetsTimeline({totalSets, workTime, restTime, progress, pulsingSet}) {
     const cycleTime = workTime + restTime;
     const totalTime = totalSets * cycleTime;
 
@@ -25,7 +26,9 @@ export default function SetsTimeline({totalSets, workTime, restTime, progress}) 
         const cycleStart = index * cycleTime;
         marks.push({
             key: `work-${index}`,
-            className: 'sets-timeline-work',
+            className: index === pulsingSet
+                ? 'sets-timeline-work sets-timeline-work--waiting'
+                : 'sets-timeline-work',
             start: (cycleStart / totalTime) * 100,
             width: (workTime / totalTime) * 100,
         });

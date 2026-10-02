@@ -16,7 +16,8 @@ export default function ProgramSetup({handleStart}) {
 
     const workTime = (Number(workMinutes) || 0) * 60 + (Number(workSeconds) || 0);
     const restTime = (Number(restMinutes) || 0) * 60 + (Number(restSeconds) || 0);
-    const isReady = sets > 0 && workTime > 0 && restTime > 0;
+    // La durée d'effort est facultative : laissée vide, la série se termine au bouton.
+    const isReady = sets > 0 && restTime > 0;
 
     const handleSubmit = () => {
         if (isReady) {
@@ -42,31 +43,6 @@ export default function ProgramSetup({handleStart}) {
             </button>
         </div>
 
-        <h2 className="section-title">Reps duration</h2>
-        <div className="button-group">
-            <input
-                type="number"
-                min="0"
-                inputMode="numeric"
-                className="custom-time-input"
-                placeholder="min"
-                aria-label="minutes des répétitions"
-                value={workMinutes}
-                onChange={(event) => setWorkMinutes(event.target.value)}
-            />
-            <input
-                type="number"
-                min="0"
-                max="59"
-                inputMode="numeric"
-                className="custom-time-input"
-                placeholder="sec"
-                aria-label="secondes des répétitions"
-                value={workSeconds}
-                onChange={(event) => setWorkSeconds(event.target.value)}
-            />
-        </div>
-
         <h2 className="section-title">Rest between sets</h2>
         <div className="button-group">
             <input
@@ -89,6 +65,32 @@ export default function ProgramSetup({handleStart}) {
                 aria-label="secondes de repos"
                 value={restSeconds}
                 onChange={(event) => setRestSeconds(event.target.value)}
+            />
+        </div>
+
+        <h2 className="section-title">Reps duration (optional)</h2>
+        <p className="setup-hint">Leave empty to end each set with a button</p>
+        <div className="button-group">
+            <input
+                type="number"
+                min="0"
+                inputMode="numeric"
+                className="custom-time-input"
+                placeholder="min"
+                aria-label="minutes des répétitions"
+                value={workMinutes}
+                onChange={(event) => setWorkMinutes(event.target.value)}
+            />
+            <input
+                type="number"
+                min="0"
+                max="59"
+                inputMode="numeric"
+                className="custom-time-input"
+                placeholder="sec"
+                aria-label="secondes des répétitions"
+                value={workSeconds}
+                onChange={(event) => setWorkSeconds(event.target.value)}
             />
         </div>
 

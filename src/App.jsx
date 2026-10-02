@@ -5,7 +5,7 @@
  * effort → repos → effort → repos … jusqu'à 0 série (un dernier repos est joué après
  * la dernière série).
  */
-import {useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import CountDown from "./components/CountDown.jsx";
 import SetsCounter from "./components/SetsCounter.jsx";
 import SetsTimeline from "./components/SetsTimeline.jsx";
@@ -37,19 +37,32 @@ function App() {
     const minutes = Math.floor(countDown / 60);
     const seconds = countDown % 60;
     const isRunning = phase === WORK || phase === REST;
+    // Sans durée d'effort saisie, l'effort n'est pas chronométré : le chrono reste à 00:00
+    // et c'est l'utilisateur qui déclare la série terminée.
+    const isFreeWork = workTime === 0;
+    const isFreeWorkPhase = isFreeWork && phase === WORK;
+
+    // La frise a besoin d'une largeur pour l'effort : en mode libre on lui en donne une
+    // nominale, la moitié du repos, soit un tiers du cycle.
+    const slotWorkTime = isFreeWork ? restTime / 2 : workTime;
 
     // Part du programme déjà écoulée (0 à 1), déduite du temps restant :
     // pendant un effort il reste le repos de la série en cours plus les séries suivantes,
     // pendant un repos il ne reste que les séries suivantes.
-    const cycleTime = workTime + restTime;
+    const cycleTime = slotWorkTime + restTime;
     const totalTime = totalSets * cycleTime;
     let remainingTime = 0;
-    if (phase === WORK) {
+    if (isFreeWorkPhase) {
+        // L'effort libre n'a pas de durée : la progression stationne au début de son créneau.
+        remainingTime = setsLeft * cycleTime;
+    } else if (phase === WORK) {
         remainingTime = countDown + restTime + (setsLeft - 1) * cycleTime;
     } else if (phase === REST) {
         remainingTime = countDown + setsLeft * cycleTime;
     }
     const progress = totalTime > 0 ? 1 - remainingTime / totalTime : 0;
+    // Série dont l'effort est en attente du clic, pour la faire pulser sur la frise.
+    const pulsingSet = isFreeWorkPhase ? totalSets - setsLeft : -1;
 
     // Un seul objet Audio pour toute la session, instancié au premier besoin.
     const beepRef = useRef(null);
@@ -99,6 +112,19 @@ function App() {
         setIsPaused(!isPaused);
     };
 
+    // Seule sortie d'un effort, qu'il soit chronométré (fin du décompte) ou libre (clic
+    // sur Set done) : la série réalisée est décomptée, puis le repos démarre.
+    const startRest = useCallback(() => {
+        setSetsLeft((current) => (current > 0 ? current - 1 : 0));
+        setPhase(REST);
+        setCountDown(restTime);
+    }, [restTime]);
+
+    const handleSetDone = () => {
+        stopBeep();
+        startRest();
+    };
+
     // Écourte la phase en cours : la transition est prise en charge par l'effet ci-dessous.
     const handleSkip = () => {
         stopBeep();
@@ -115,8 +141,9 @@ function App() {
     };
 
     // Intervalle unique, recréé seulement quand la phase ou la pause change.
+    // Un effort libre ne fait rien défiler : aucun intervalle n'est créé.
     useEffect(() => {
-        if (!isRunning || isPaused) {
+        if (!isRunning || isPaused || isFreeWorkPhase) {
             return undefined;
         }
 
@@ -125,11 +152,12 @@ function App() {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isRunning, isPaused]);
+    }, [isRunning, isPaused, isFreeWorkPhase]);
 
     // Bip des 5 dernières secondes, puis passage à la phase suivante quand on atteint 0.
+    // Un effort libre stationne à 0 : il ne bipe pas et n'en sort que par le bouton.
     useEffect(() => {
-        if (!isRunning) {
+        if (!isRunning || isFreeWorkPhase) {
             return;
         }
 
@@ -143,17 +171,14 @@ function App() {
         }
 
         if (phase === WORK) {
-            // Une série vient d'être réalisée : on la décompte puis on enchaîne sur le repos.
-            setSetsLeft((current) => (current > 0 ? current - 1 : 0));
-            setPhase(REST);
-            setCountDown(restTime);
+            startRest();
         } else if (setsLeft > 0) {
             setPhase(WORK);
             setCountDown(workTime);
         } else {
             setPhase(DONE);
         }
-    }, [countDown, phase, isRunning, setsLeft, workTime, restTime]);
+    }, [countDown, phase, isRunning, isFreeWorkPhase, setsLeft, workTime, startRest]);
 
     return (<div className="container-fluid">
         <div id="header">
@@ -165,13 +190,16 @@ function App() {
             <CountDown minutes={minutes} seconds={seconds} label={PHASE_LABELS[phase]}>
                 {phase !== IDLE && <SetsTimeline
                     totalSets={totalSets}
-                    workTime={workTime}
+                    workTime={slotWorkTime}
                     restTime={restTime}
-                    progress={progress}/>}
+                    progress={progress}
+                    pulsingSet={pulsingSet}/>}
             </CountDown>
             {isRunning && <SetsCounter setsLeft={setsLeft}/>}
             {isRunning ? <ProgramControls
                 isPaused={isPaused}
+                isFreeWorkPhase={isFreeWorkPhase}
+                handleSetDone={handleSetDone}
                 handleTogglePause={handleTogglePause}
                 handleSkip={handleSkip}
                 handleStop={handleStop}/> : <ProgramSetup handleStart={handleStart}/>}
