@@ -26,7 +26,13 @@ body {
 .container-fluid {
     display: flex;
     flex-direction: column;
+    /* dvh suit la hauteur réelle du viewport mobile, barres du navigateur comprises */
     min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    /* Au-delà, les tuiles s'étireraient inutilement sur un écran d'ordinateur */
+    max-width: 560px;
+    margin: 0 auto;
     padding: 20px 16px;
 }
 
@@ -66,9 +72,12 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    /* « safe » évite que le haut du contenu soit rogné quand il dépasse la hauteur
+       disponible : le centrage est alors abandonné au profit du défilement */
     justify-content: center;
-    gap: 24px;
-    margin: 20px 0;
+    justify-content: safe center;
+    gap: 16px;
+    margin: 16px 0;
 }
 
 #countDown {
@@ -326,17 +335,7 @@ h3 {
 }
 
 @media (max-width: 768px) {
-    html, body {
-        height: 100%;
-    }
-
-    body {
-        min-height: 100vh;
-    }
-
     .container-fluid {
-        min-height: 100vh;
-        height: 100vh;
         padding: 8px;
     }
 
@@ -354,11 +353,8 @@ h3 {
     }
 
     #main-content {
-        flex: 1;
-        justify-content: space-between;
-        gap: 12px;
-        margin: 0;
-        overflow: hidden;
+        gap: 10px;
+        margin: 8px 0;
     }
 
     #countDown {
