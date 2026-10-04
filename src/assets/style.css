@@ -20,6 +20,7 @@ body {
     background: var(--bg);
     min-height: 100vh;
     color: var(--fg);
+    line-height: 1.5;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -126,6 +127,9 @@ h3 {
     background: var(--tile-alt);
     color: var(--dim);
     transition: all 0.2s ease;
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1.5;
 }
 
 .btn-success {
@@ -289,7 +293,7 @@ h3 {
 /* Libellé de la phase en cours, au-dessus du compte à rebours */
 .phase-label {
     font-family: 'Anton', sans-serif;
-    font-size: 14px;
+    font-size: clamp(24px, 7vw, 32px);
     color: var(--orange);
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -304,6 +308,7 @@ h3 {
     transform: none;
     box-shadow: none;
     opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .custom-time-input {
@@ -312,7 +317,9 @@ h3 {
     border-radius: 10px;
     padding: 12px 10px;
     font-weight: 800;
-    font-size: 14px;
+    /* 16px minimum : en dessous, Safari iOS zoome sur le champ à chaque focus */
+    font-size: 16px;
+    font-family: inherit;
     text-align: center;
     border: 1px solid var(--border);
     background: var(--tile-alt);

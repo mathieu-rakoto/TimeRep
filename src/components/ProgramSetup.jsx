@@ -1,5 +1,16 @@
 import {useState} from "react";
 
+// Au-delà, la frise devient illisible et la séance irréaliste.
+const MAX_SETS = 12;
+const MAX_SECONDS = 59;
+
+// Ne garde que des chiffres : pas de signe, de décimale ni de notation scientifique.
+// Les secondes sont plafonnées à 59, les minutes à 2 chiffres.
+const sanitize = (value, max = Infinity) => {
+    const digits = value.replace(/\D/g, '').slice(0, 2);
+    return digits !== '' && Number(digits) > max ? String(max) : digits;
+};
+
 /**
  * Composant de réglage du programme : nombre de séries, temps de repos entre les séries
  * et temps que va durer les répétitions. Le bouton Start remonte les trois valeurs à App.
@@ -38,7 +49,8 @@ export default function ProgramSetup({handleStart}) {
             <button
                 className="btn btn-success"
                 type="button"
-                onClick={() => setSets(sets + 1)}>
+                disabled={sets >= MAX_SETS}
+                onClick={() => setSets(Math.min(sets + 1, MAX_SETS))}>
                 + set
             </button>
         </div>
@@ -46,25 +58,24 @@ export default function ProgramSetup({handleStart}) {
         <h2 className="section-title">Rest between sets</h2>
         <div className="button-group">
             <input
-                type="number"
-                min="0"
+                type="text"
+                pattern="[0-9]*"
                 inputMode="numeric"
                 className="custom-time-input"
                 placeholder="min"
                 aria-label="minutes de repos"
                 value={restMinutes}
-                onChange={(event) => setRestMinutes(event.target.value)}
+                onChange={(event) => setRestMinutes(sanitize(event.target.value))}
             />
             <input
-                type="number"
-                min="0"
-                max="59"
+                type="text"
+                pattern="[0-9]*"
                 inputMode="numeric"
                 className="custom-time-input"
                 placeholder="sec"
                 aria-label="secondes de repos"
                 value={restSeconds}
-                onChange={(event) => setRestSeconds(event.target.value)}
+                onChange={(event) => setRestSeconds(sanitize(event.target.value, MAX_SECONDS))}
             />
         </div>
 
@@ -72,25 +83,24 @@ export default function ProgramSetup({handleStart}) {
         <p className="setup-hint">Leave empty to end each set with a button</p>
         <div className="button-group">
             <input
-                type="number"
-                min="0"
+                type="text"
+                pattern="[0-9]*"
                 inputMode="numeric"
                 className="custom-time-input"
                 placeholder="min"
                 aria-label="minutes des répétitions"
                 value={workMinutes}
-                onChange={(event) => setWorkMinutes(event.target.value)}
+                onChange={(event) => setWorkMinutes(sanitize(event.target.value))}
             />
             <input
-                type="number"
-                min="0"
-                max="59"
+                type="text"
+                pattern="[0-9]*"
                 inputMode="numeric"
                 className="custom-time-input"
                 placeholder="sec"
                 aria-label="secondes des répétitions"
                 value={workSeconds}
-                onChange={(event) => setWorkSeconds(event.target.value)}
+                onChange={(event) => setWorkSeconds(sanitize(event.target.value, MAX_SECONDS))}
             />
         </div>
 
