@@ -2,6 +2,7 @@
  * Composant affichant la ligne temporelle du programme.
  * Chaque série est dessinée comme une barre épaisse (l'effort) suivie d'un trait fin
  * (le repos), tous deux larges au prorata de leur durée, et terminée par un nœud rond.
+ * La dernière série n'est suivie d'aucun repos.
  * La frise est empilée en deux couches identiques : une grise en fond, une lime par
  * dessus, rognée à gauche au fil du temps. Le lime ne couvre donc que le temps restant
  * et recule de nœud en nœud, et la limite entre les deux indique où l'on en est.
@@ -14,7 +15,7 @@
  */
 export default function SetsTimeline({totalSets, workTime, restTime, progress, pulsingSet}) {
     const cycleTime = workTime + restTime;
-    const totalTime = totalSets * cycleTime;
+    const totalTime = totalSets * cycleTime - restTime;
 
     if (totalTime <= 0) {
         return null;
@@ -32,16 +33,19 @@ export default function SetsTimeline({totalSets, workTime, restTime, progress, p
             start: (cycleStart / totalTime) * 100,
             width: (workTime / totalTime) * 100,
         });
-        marks.push({
-            key: `rest-${index}`,
-            className: 'sets-timeline-rest',
-            start: ((cycleStart + workTime) / totalTime) * 100,
-            width: (restTime / totalTime) * 100,
-        });
+        const isLast = index === totalSets - 1;
+        if (!isLast) {
+            marks.push({
+                key: `rest-${index}`,
+                className: 'sets-timeline-rest',
+                start: ((cycleStart + workTime) / totalTime) * 100,
+                width: (restTime / totalTime) * 100,
+            });
+        }
         marks.push({
             key: `node-${index}`,
             className: 'sets-timeline-node',
-            start: ((cycleStart + cycleTime) / totalTime) * 100,
+            start: ((cycleStart + (isLast ? workTime : cycleTime)) / totalTime) * 100,
             width: null,
         });
     }
