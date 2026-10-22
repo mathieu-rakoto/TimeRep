@@ -15,6 +15,8 @@ const sanitize = (value, max = Infinity) => {
  * Composant de réglage du programme : nombre de séries, temps de repos entre les séries
  * et temps que va durer les répétitions. Le bouton Start remonte les trois valeurs à App.
  * Les durées sont saisies en minutes/secondes et remontent converties en secondes.
+ * Un interrupteur choisit le mode : REST (par défaut), l'effort est libre et se termine
+ * au bouton ; REPS, l'effort est chronométré et sa durée s'ajoute à celle du repos.
  * @param handleStart props de la fonction qui lance le programme (sets, workTime, restTime).
  * @returns {JSX.Element}
  */
@@ -24,15 +26,18 @@ export default function ProgramSetup({handleStart}) {
     const [workSeconds, setWorkSeconds] = useState('');
     const [restMinutes, setRestMinutes] = useState('');
     const [restSeconds, setRestSeconds] = useState('');
+    const [isRepsMode, setIsRepsMode] = useState(false);
 
     const workTime = (Number(workMinutes) || 0) * 60 + (Number(workSeconds) || 0);
     const restTime = (Number(restMinutes) || 0) * 60 + (Number(restSeconds) || 0);
-    // La durée d'effort est facultative : laissée vide, la série se termine au bouton.
-    const isReady = sets > 0 && restTime > 0;
+    // Le repos est toujours requis. En mode REPS la durée d'effort l'est aussi ; en mode
+    // REST elle est ignorée (gardée pour un retour en REPS) et l'effort part libre, à 0.
+    const effectiveWorkTime = isRepsMode ? workTime : 0;
+    const isReady = sets > 0 && restTime > 0 && (!isRepsMode || workTime > 0);
 
     const handleSubmit = () => {
         if (isReady) {
-            handleStart(sets, workTime, restTime);
+            handleStart(sets, effectiveWorkTime, restTime);
         }
     };
 
@@ -54,6 +59,24 @@ export default function ProgramSetup({handleStart}) {
                 + set
             </button>
         </div>
+
+        <button
+            type="button"
+            role="switch"
+            className="mode-switch"
+            aria-checked={isRepsMode}
+            aria-label="chronométrer les répétitions"
+            onClick={() => setIsRepsMode(!isRepsMode)}>
+            <span className={isRepsMode ? 'mode-switch-label' : 'mode-switch-label mode-switch-label--active'}>
+                Rest only
+            </span>
+            <span className="mode-switch-track">
+                <span className="mode-switch-knob"></span>
+            </span>
+            <span className={isRepsMode ? 'mode-switch-label mode-switch-label--active' : 'mode-switch-label'}>
+                Rest + reps
+            </span>
+        </button>
 
         <h2 className="section-title">Rest between sets</h2>
         <div className="button-group">
@@ -79,30 +102,31 @@ export default function ProgramSetup({handleStart}) {
             />
         </div>
 
-        <h2 className="section-title">Reps duration (optional)</h2>
-        <p className="setup-hint">Leave empty to end each set with a button</p>
-        <div className="button-group">
-            <input
-                type="text"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                className="custom-time-input"
-                placeholder="min"
-                aria-label="minutes des répétitions"
-                value={workMinutes}
-                onChange={(event) => setWorkMinutes(sanitize(event.target.value))}
-            />
-            <input
-                type="text"
-                pattern="[0-9]*"
-                inputMode="numeric"
-                className="custom-time-input"
-                placeholder="sec"
-                aria-label="secondes des répétitions"
-                value={workSeconds}
-                onChange={(event) => setWorkSeconds(sanitize(event.target.value, MAX_SECONDS))}
-            />
-        </div>
+        {isRepsMode && <>
+            <h2 className="section-title">Reps duration</h2>
+            <div className="button-group">
+                <input
+                    type="text"
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    className="custom-time-input"
+                    placeholder="min"
+                    aria-label="minutes des répétitions"
+                    value={workMinutes}
+                    onChange={(event) => setWorkMinutes(sanitize(event.target.value))}
+                />
+                <input
+                    type="text"
+                    pattern="[0-9]*"
+                    inputMode="numeric"
+                    className="custom-time-input"
+                    placeholder="sec"
+                    aria-label="secondes des répétitions"
+                    value={workSeconds}
+                    onChange={(event) => setWorkSeconds(sanitize(event.target.value, MAX_SECONDS))}
+                />
+            </div>
+        </>}
 
         <button
             type="button"

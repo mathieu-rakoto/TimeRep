@@ -2,7 +2,7 @@
  * Composant affichant la ligne temporelle du programme.
  * Chaque série est dessinée comme une barre épaisse (l'effort) suivie d'un trait fin
  * (le repos), tous deux larges au prorata de leur durée, et terminée par un nœud rond.
- * La dernière série n'est suivie d'aucun repos.
+ * La dernière série a elle aussi son repos : la frise se termine sur son nœud.
  * La frise est empilée en deux couches identiques : une grise en fond, une lime par
  * dessus, rognée à gauche au fil du temps. Le lime ne couvre donc que le temps restant
  * et recule de nœud en nœud, et la limite entre les deux indique où l'on en est.
@@ -15,7 +15,7 @@
  */
 export default function SetsTimeline({totalSets, workTime, restTime, progress, pulsingSet}) {
     const cycleTime = workTime + restTime;
-    const totalTime = totalSets * cycleTime - restTime;
+    const totalTime = totalSets * cycleTime;
 
     if (totalTime <= 0) {
         return null;
@@ -33,19 +33,16 @@ export default function SetsTimeline({totalSets, workTime, restTime, progress, p
             start: (cycleStart / totalTime) * 100,
             width: (workTime / totalTime) * 100,
         });
-        const isLast = index === totalSets - 1;
-        if (!isLast) {
-            marks.push({
-                key: `rest-${index}`,
-                className: 'sets-timeline-rest',
-                start: ((cycleStart + workTime) / totalTime) * 100,
-                width: (restTime / totalTime) * 100,
-            });
-        }
+        marks.push({
+            key: `rest-${index}`,
+            className: 'sets-timeline-rest',
+            start: ((cycleStart + workTime) / totalTime) * 100,
+            width: (restTime / totalTime) * 100,
+        });
         marks.push({
             key: `node-${index}`,
             className: 'sets-timeline-node',
-            start: ((cycleStart + (isLast ? workTime : cycleTime)) / totalTime) * 100,
+            start: ((cycleStart + cycleTime) / totalTime) * 100,
             width: null,
         });
     }
@@ -58,12 +55,17 @@ export default function SetsTimeline({totalSets, workTime, restTime, progress, p
             : {left: `${mark.start}%`, width: `${mark.width}%`}}
     ></span>));
 
+    // Le dernier nœud est centré sur le bord droit et en déborde de son rayon : la couche
+    // lime est élargie d'autant pour qu'il reste entier, sauf une fois le programme fini
+    // où plus rien ne doit en rester.
+    const overflowRight = progress < 1 ? '-6px' : '0px';
+
     return (<div className="sets-timeline">
         <div className="sets-timeline-track">
             <div className="sets-timeline-layer">{renderMarks()}</div>
             <div
                 className="sets-timeline-layer sets-timeline-layer--remaining"
-                style={{clipPath: `inset(0 0 0 ${progress * 100}%)`}}>
+                style={{clipPath: `inset(0 ${overflowRight} 0 ${progress * 100}%)`}}>
                 {renderMarks()}
             </div>
         </div>

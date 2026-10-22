@@ -2,8 +2,9 @@
  * Composant principal.
  * Pilote le programme d'entraînement : on saisit un nombre de séries, la durée des
  * répétitions et la durée du repos, puis le programme enchaîne seul
- * effort → repos → effort → repos … jusqu'à 0 série (pas de repos après la dernière
- * série : le programme est terminé dès qu'elle l'est).
+ * effort → repos → effort → repos … jusqu'à 0 série. La dernière série est elle aussi
+ * suivie d'un repos, qui chronomètre la récupération avant l'exercice suivant ;
+ * le programme est terminé à la fin de ce repos.
  */
 import {useCallback, useEffect, useRef, useState} from "react";
 import CountDown from "./components/CountDown.jsx";
@@ -46,20 +47,20 @@ function App() {
     // nominale, la moitié du repos, soit un tiers du cycle.
     const slotWorkTime = isFreeWork ? restTime / 2 : workTime;
 
-    // Part du programme déjà écoulée (0 à 1), déduite du temps restant. Le dernier effort
-    // n'est suivi d'aucun repos, d'où le « - restTime » du temps total :
-    // pendant un effort il reste le temps courant plus les séries suivantes,
-    // pendant un repos il reste le temps courant plus les séries suivantes (dernier repos exclu).
+    // Part du programme déjà écoulée (0 à 1), déduite du temps restant. Chaque série,
+    // la dernière comprise, est suivie d'un repos :
+    // pendant un effort il reste le temps courant, son repos, puis les séries suivantes,
+    // pendant un repos il reste le temps courant plus les séries suivantes.
     const cycleTime = slotWorkTime + restTime;
-    const totalTime = totalSets * cycleTime - restTime;
+    const totalTime = totalSets * cycleTime;
     let remainingTime = 0;
     if (isFreeWorkPhase) {
         // L'effort libre n'a pas de durée : la progression stationne au début de son créneau.
-        remainingTime = setsLeft * cycleTime - restTime;
+        remainingTime = setsLeft * cycleTime;
     } else if (phase === WORK) {
-        remainingTime = countDown + (setsLeft - 1) * cycleTime;
+        remainingTime = countDown + restTime + (setsLeft - 1) * cycleTime;
     } else if (phase === REST) {
-        remainingTime = countDown + setsLeft * cycleTime - restTime;
+        remainingTime = countDown + setsLeft * cycleTime;
     }
     const progress = totalTime > 0 ? 1 - remainingTime / totalTime : 0;
     // Série dont l'effort est en attente du clic, pour la faire pulser sur la frise.
@@ -130,14 +131,9 @@ function App() {
     };
 
     // Seule sortie d'un effort, qu'il soit chronométré (fin du décompte) ou libre (clic
-    // sur Set done) : la série réalisée est décomptée, puis le repos démarre,
-    // sauf après la dernière série où le programme est terminé.
+    // sur Set done) : la série réalisée est décomptée, puis le repos démarre, y compris
+    // après la dernière série (il se joue alors avec 0 série restante).
     const startRest = useCallback(() => {
-        if (setsLeft <= 1) {
-            setSetsLeft(0);
-            setPhase(DONE);
-            return;
-        }
         setSetsLeft(setsLeft - 1);
         setPhase(REST);
         beginPhase(restTime);
@@ -241,21 +237,22 @@ function App() {
             return;
         }
 
-        // Le dernier effort mène directement à DONE (voir startRest) : un repos est
-        // toujours suivi d'une nouvelle série.
+        // Un repos mène à la série suivante, sauf le dernier, qui termine le programme.
         if (phase === WORK) {
             startRest();
+        } else if (setsLeft === 0) {
+            setPhase(DONE);
         } else {
             setPhase(WORK);
             beginPhase(workTime);
         }
-    }, [countDown, phase, isRunning, isFreeWorkPhase, workTime, startRest, beginPhase]);
+    }, [countDown, phase, isRunning, isFreeWorkPhase, setsLeft, workTime, startRest, beginPhase]);
 
     return (<div className="container-fluid">
         <div id="header">
             <h1 id="title">Time&apos; Rep</h1>
             <div id="header-rule"></div>
-            <p id="version">v3.1</p>
+            <p id="version">v3.2</p>
         </div>
         <div id="main-content">
             <CountDown minutes={minutes} seconds={seconds} label={PHASE_LABELS[phase]}>
@@ -276,7 +273,7 @@ function App() {
                 handleStop={handleStop}/> : <ProgramSetup handleStart={handleStart}/>}
         </div>
         <div id="copyright" className="text-center">
-            Copyright © TimeRep&apos; v3.1 propriété de Mathieu RAKOTOARITSIMA 09 mai 2026
+            Copyright © TimeRep&apos; v3.2 propriété de Mathieu RAKOTOARITSIMA 09 mai 2026
         </div>
     </div>);
 }

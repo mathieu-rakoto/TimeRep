@@ -8,6 +8,6 @@ export default function SetsCounter({setsLeft}) {
 
     return (<div className="sets-section">
         <h3>{setsLeft}</h3>
-        <p id="repCount">{setsLeft > 1 ? 'sets' : 'set'} left</p>
+        <p id="repCount">{setsLeft === 1 ? 'set' : 'sets'} left</p>
     </div>);
 }
