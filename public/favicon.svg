@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+  <!-- Cadran : effort (lime) puis repos (orange), longueurs en unités réelles (circonférence 138.23) -->
+  <g fill="none" stroke-width="8" transform="rotate(-90 32 32)">
+    <circle cx="32" cy="32" r="22" stroke="#2a2a2a"/>
+    <circle cx="32" cy="32" r="22" stroke="#ff7a45" stroke-dasharray="41.47 96.76" stroke-dashoffset="-91.23"/>
+    <circle cx="32" cy="32" r="22" stroke="#e4fa3c" stroke-dasharray="82.94 55.29"/>
+  </g>
+  <!-- Haltère -->
+  <g fill="#f5f5f0">
+    <rect x="26" y="29.5" width="12" height="5"/>
+    <rect x="21" y="22" width="5" height="20" rx="1.5"/>
+    <rect x="38" y="22" width="5" height="20" rx="1.5"/>
+    <rect x="17" y="26" width="4" height="12" rx="1.5"/>
+    <rect x="43" y="26" width="4" height="12" rx="1.5"/>
+  </g>
+</svg>
